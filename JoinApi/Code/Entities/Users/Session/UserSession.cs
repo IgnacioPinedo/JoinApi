@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-[Table("TB_UserSession")]
+[Table("tb_UserSession")]
 public class UserSession
 {
     [Key]

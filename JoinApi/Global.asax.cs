@@ -10,7 +10,7 @@ using System.Web.Http;
 
 namespace JoinApi
 {
-    public class Global : HttpApplication
+    public class WebApiApplication : HttpApplication
     {
         void Application_Start(object sender, EventArgs e)
         {
