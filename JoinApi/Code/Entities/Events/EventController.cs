@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 
-namespace JoinApi.Code.Entities.Events
+public class EventController : ApiController
 {
-    public class EventController
-    {
-    }
+    private EventContext EventContext = new EventContext();
 }
