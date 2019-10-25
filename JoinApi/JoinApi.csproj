@@ -126,6 +126,7 @@
     <Compile Include="Code\Entities\Events\EventContext.cs" />
     <Compile Include="Code\Entities\Events\EventController.cs" />
     <Compile Include="Code\Entities\Events\Type\EventType.cs" />
+    <Compile Include="Code\Entities\Users\Event\UserEvent.cs" />
     <Compile Include="Code\Entities\Users\Session\UserSession.cs" />
     <Compile Include="Code\Entities\Users\User.cs" />
     <Compile Include="Code\Entities\Users\UserContext.cs" />
