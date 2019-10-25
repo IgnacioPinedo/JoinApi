@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="JoinApi.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="JoinApi.WebApiApplication" Language="C#" %>
