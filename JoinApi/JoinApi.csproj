@@ -119,6 +119,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\Entities\Settings\SettingsController.cs" />
     <Compile Include="Code\Entities\Users\Session\UserSession.cs" />
     <Compile Include="Code\Entities\Users\User.cs" />
     <Compile Include="Code\Entities\Users\UserContext.cs" />
