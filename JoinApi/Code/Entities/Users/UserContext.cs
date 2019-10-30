@@ -110,7 +110,7 @@ public class UserContext : DbContext
             {
                 UserId = userId,
                 SessionToken = sessionToken,
-                ExpireDate = DateTime.Now
+                ExpireDate = DateTime.Now.AddDays(1)
             };
 
             UserSession.Add(newUserSession);
