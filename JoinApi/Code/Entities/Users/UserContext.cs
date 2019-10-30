@@ -13,6 +13,7 @@ public class UserContext : DbContext
 
     public DbSet<User> User { get; set; }
     public DbSet<UserSession> UserSession { get; set; }
+    public DbSet<UserEvent> UserEvent { get; set; }
 
     public bool Register(string email, string password, string firstName, string lastName, string faceId, string googleId)
     {
