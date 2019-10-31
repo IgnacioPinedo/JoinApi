@@ -10,10 +10,9 @@ public class EventController : ApiController
     private EventContext EventContext = new EventContext();
 
     [HttpGet]
-    [Route("Event({eventId})")]
+    [Route("Events({eventId})")]
     public IHttpActionResult Get(int eventId)
     {
-
         string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
         bool auth = false;
 
@@ -35,7 +34,7 @@ public class EventController : ApiController
     }
 
     [HttpPost]
-    [Route("Event")]
+    [Route("Events")]
     public IHttpActionResult Post(JObject json)
     {
         string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
@@ -50,7 +49,7 @@ public class EventController : ApiController
         {
             string name = json["Name"]?.ToString();
 
-            if (!Int32.TryParse(json["EventId"]?.ToString(), out int eventId))
+            if (!Int32.TryParse(json[" "]?.ToString(), out int eventId))
             {
                 eventId = 0;
             }
@@ -93,7 +92,7 @@ public class EventController : ApiController
     }
 
     [HttpDelete]
-    [Route("Event({eventId})")]
+    [Route("Events({eventId})")]
     public IHttpActionResult Delete(int eventId)
     {
         string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();

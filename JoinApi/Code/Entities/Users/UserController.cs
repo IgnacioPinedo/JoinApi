@@ -138,6 +138,29 @@ public class UserController : ApiController
             });
     }
 
+    [HttpDelete]
+    [Route("Users")]
+    public IHttpActionResult Delete()
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+        User user;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            user = UserContext.Get(userKey);
+
+            return Ok(UserContext.Delete(user.Id));
+        }
+
+        return Ok("Unauthorized");
+    }
+
     bool IsValidEmail(string email)
     {
         try
