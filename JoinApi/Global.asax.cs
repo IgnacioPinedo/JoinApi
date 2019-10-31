@@ -12,8 +12,11 @@ namespace JoinApi
 {
     public class WebApiApplication : HttpApplication
     {
+
         void Application_Start(object sender, EventArgs e)
         {
+            SqlServerTypes.Utilities.LoadNativeAssemblies(Server.MapPath("~/bin"));
+
             GlobalConfiguration.Configure(WebApiConfig.Register);    
         }
     }

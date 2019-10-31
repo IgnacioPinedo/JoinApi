@@ -49,7 +49,7 @@ public class EventController : ApiController
         {
             string name = json["Name"]?.ToString();
 
-            if (!Int32.TryParse(json[" "]?.ToString(), out int eventId))
+            if (!Int32.TryParse(json["EventId"]?.ToString(), out int eventId))
             {
                 eventId = 0;
             }

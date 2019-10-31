@@ -27,7 +27,8 @@ public class EventContext : DbContext
             AdministratorId = admId,
             Name = name,
             Date = date,
-            Location = SqlGeography.Point(latitude, longitude, DefaultSRID)
+            Latitude = latitude,
+            Longitude = longitude
         };
 
         Event.Add(newEvent);
@@ -43,12 +44,14 @@ public class EventContext : DbContext
         if (updateEvent != null)
         {
             updateEvent.Date = date != null ? date : updateEvent.Date;
-            updateEvent.Location = (longitude != 0 && latitude != 0) ? SqlGeography.Point(latitude, longitude, DefaultSRID) : updateEvent.Location;
+            updateEvent.Latitude = (latitude != 0) ? latitude : updateEvent.Latitude;
+            updateEvent.Longitude = (longitude != 0) ? longitude : updateEvent.Longitude;
             updateEvent.Name = (name != null && name != "") ? name : updateEvent.Name;
             updateEvent.TypeId = typeId != 0 ? typeId : updateEvent.TypeId;
 
             Entry(updateEvent.Date).State = EntityState.Modified;
-            Entry(updateEvent.Location).State = EntityState.Modified;
+            Entry(updateEvent.Latitude).State = EntityState.Modified;
+            Entry(updateEvent.Longitude).State = EntityState.Modified;
             Entry(updateEvent.Name).State = EntityState.Modified;
             Entry(updateEvent.TypeId).State = EntityState.Modified;
 

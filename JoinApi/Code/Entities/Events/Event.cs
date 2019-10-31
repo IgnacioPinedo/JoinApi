@@ -17,5 +17,6 @@ public class Event
     public int AdministratorId { get; set; }
     public string Name { get; set; }
     public DateTime Date { get; set; }
-    public SqlGeography Location { get; set; }
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
 }
