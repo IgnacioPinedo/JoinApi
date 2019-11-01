@@ -48,6 +48,7 @@ public class EventController : ApiController
         if(auth)
         {
             string name = json["Name"]?.ToString();
+            string description = json["Description"]?.ToString();
 
             if (!int.TryParse(json["EventId"]?.ToString(), out int eventId))
             {

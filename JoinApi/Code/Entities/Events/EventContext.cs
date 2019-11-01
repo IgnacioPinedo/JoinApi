@@ -22,7 +22,7 @@ public class EventContext : DbContext
         return Event.Where(s => s.Id == eventId).FirstOrDefault();
     }
 
-    public Event Create(int typeId, int admId, string name, DateTime date, double longitude, double latitude)
+    public Event Create(int typeId, int admId, string name, string description, DateTime date, double longitude, double latitude)
     {
         if(EventType.Where(s => s.Id == typeId).Count() > 0)
         {
@@ -32,6 +32,7 @@ public class EventContext : DbContext
                 TypeId = typeId,
                 AdministratorId = admId,
                 Name = name,
+                Description = description,
                 Date = date,
                 Latitude = latitude,
                 Longitude = longitude
@@ -47,21 +48,23 @@ public class EventContext : DbContext
         return null;
     }
 
-    public Event Update(int eventId, int typeId, int admId, string name, DateTime date, double longitude, double latitude)
+    public Event Update(int eventId, int typeId, int admId, string name, string description, DateTime date, double longitude, double latitude)
     {
-        Event updateEvent = Event.Where(s => s.Id == eventId).FirstOrDefault();
+        Event updateEvent = Event.Where(s => s.Id == eventId && s.AdministratorId == admId).FirstOrDefault();
         if (updateEvent != null)
         {
             updateEvent.Date = date != null ? date : updateEvent.Date;
             updateEvent.Latitude = (latitude != 0) ? latitude : updateEvent.Latitude;
             updateEvent.Longitude = (longitude != 0) ? longitude : updateEvent.Longitude;
-            updateEvent.Name = (name != null && name != "") ? name : updateEvent.Name;
+            updateEvent.Name = !string.IsNullOrEmpty(name) ? name : updateEvent.Name;
+            updateEvent.Description = !string.IsNullOrEmpty(description) ? description : updateEvent.Description;
             updateEvent.TypeId = typeId != 0 && EventType.Where(s => s.Id == typeId).Count() > 0 ? typeId : updateEvent.TypeId;
 
             Entry(updateEvent.Date).State = EntityState.Modified;
             Entry(updateEvent.Latitude).State = EntityState.Modified;
             Entry(updateEvent.Longitude).State = EntityState.Modified;
             Entry(updateEvent.Name).State = EntityState.Modified;
+            Entry(updateEvent.Description).State = EntityState.Modified;
             Entry(updateEvent.TypeId).State = EntityState.Modified;
 
             SaveChanges();
