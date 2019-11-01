@@ -115,6 +115,13 @@ public class EventContext : DbContext
         return false;
     }
 
+    public List<int> Participants(int eventId)
+    {
+        List<int> participants = UserEvent.Where(w => w.EventId == eventId).Select(s => s.UserId).ToList();
+
+        return participants;
+    }
+
     public bool Leave(int userId, int eventId)
     {
         if (Event.Where(s => s.Id == eventId).Count() > 0 &&
