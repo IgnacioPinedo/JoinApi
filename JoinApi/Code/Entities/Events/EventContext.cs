@@ -81,12 +81,15 @@ public class EventContext : DbContext
 
         if(deleteEvent != null)
         {
+            RemoveEventParticipants(eventid);
+
             Event.Remove(deleteEvent);
 
             SaveChanges();
         }
         return false;
     }
+    
 
     #endregion
 
@@ -136,6 +139,17 @@ public class EventContext : DbContext
     public List<EventType> GetTypes()
     {
         return EventType.Select(s => s).ToList();
+    }
+
+    #endregion
+
+    #region Other Functions
+
+    private void RemoveEventParticipants(int eventId)
+    {
+        IEnumerable<UserEvent> deletedUserEvents = UserEvent.Where(s => s.EventId == eventId);
+
+        UserEvent.RemoveRange(deletedUserEvents);
     }
 
     #endregion
