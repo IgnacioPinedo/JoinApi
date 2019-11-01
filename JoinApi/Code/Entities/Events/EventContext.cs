@@ -112,8 +112,25 @@ public class EventContext : DbContext
         return false;
     }
 
+    public bool Leave(int userId, int eventId)
+    {
+        if (Event.Where(s => s.Id == eventId).Count() > 0 &&
+           Event.Where(s => s.AdministratorId != userId && s.Id == eventId).Count() == 0 &&
+           UserEvent.Where(s => s.UserId == userId && s.EventId == eventId).Count() > 0)
+        {
+            UserEvent deletedUserEvent = UserEvent.Where(s => s.EventId == eventId && s.UserId == userId).FirstOrDefault();
+
+            UserEvent.Remove(deletedUserEvent);
+
+            SaveChanges();
+
+            return true;
+        }
+        return false;
+    }
+
     #endregion
-    
+
     #region Event Types
 
     public List<EventType> GetTypes()

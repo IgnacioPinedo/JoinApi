@@ -139,12 +139,35 @@ public class EventController : ApiController
 
         if (auth && eventId > 0)
         {
+            User user = new UserContext().Get(userKey);
 
+            return Ok(EventContext.Participate(user.Id, eventId));
         }
 
         return Ok("Unauthorized");
     }
 
+    [HttpPost]
+    [Route("Events/Leave({eventId})")]
+    public IHttpActionResult Leave(int eventId)
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth && eventId > 0)
+        {
+            User user = new UserContext().Get(userKey);
+
+            return Ok(EventContext.Leave(user.Id, eventId));
+        }
+
+        return Ok("Unauthorized");
+    }
 
     #endregion
 
