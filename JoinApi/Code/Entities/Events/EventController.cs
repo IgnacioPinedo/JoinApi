@@ -25,9 +25,7 @@ public class EventController : ApiController
 
         if(auth && eventId > 0)
         {
-            Event getEvent;
-
-            getEvent = EventContext.Get(eventId);
+            Event getEvent = EventContext.Get(eventId);
 
             return Ok(getEvent);
         }
@@ -51,7 +49,7 @@ public class EventController : ApiController
         {
             string name = json["Name"]?.ToString();
 
-            if (!Int32.TryParse(json["EventId"]?.ToString(), out int eventId))
+            if (!int.TryParse(json["EventId"]?.ToString(), out int eventId))
             {
                 eventId = 0;
             }
@@ -60,7 +58,7 @@ public class EventController : ApiController
                 !double.TryParse(json["Longitude"]?.ToString(), out double longitude) ||
                 !double.TryParse(json["Latitude"]?.ToString(), out double latitude) ||
                 !DateTime.TryParse(json["Date"]?.ToString(), out DateTime date) ||
-                string.IsNullOrEmpty(name))
+                !string.IsNullOrEmpty(name))
             {
                 return BadRequest();
             }
@@ -70,22 +68,19 @@ public class EventController : ApiController
 
                 using (UserContext userContext = new UserContext())
                 {
-                    if (userContext.Authenticate(userKey))
+                    Event getEvent;
+                    user = userContext.Get(userKey);
+                    
+                    if (eventId == 0)
                     {
-                        Event getEvent;
-                        user = userContext.Get(userKey);
-
-                        if (eventId == 0)
-                        {
-                            getEvent = EventContext.Create(typeId, user.Id, name, date, longitude, latitude);
-                        }
-                        else
-                        {
-                            getEvent = EventContext.Update(eventId, typeId, user.Id, name, date, longitude, latitude);
-                        }
-
-                        if (getEvent != null) return Ok(getEvent);
+                        getEvent = EventContext.Create(typeId, user.Id, name, date, longitude, latitude);
                     }
+                    else
+                    {
+                        getEvent = EventContext.Update(eventId, typeId, user.Id, name, date, longitude, latitude);
+                    }
+                    
+                    if (getEvent != null) return Ok(getEvent);
                 }
             }
         }
@@ -112,15 +107,13 @@ public class EventController : ApiController
 
             using (UserContext userContext = new UserContext())
             {
-                if (userContext.Authenticate(userKey))
-                {
-                    bool retorno = false;
-                    user = userContext.Get(userKey);
+                bool retorno = false;
+                user = userContext.Get(userKey);
+                
+                EventContext.Delete(eventId, user.Id);
 
-                    EventContext.Delete(eventId, user.Id);
-
-                    if (retorno) return Ok(retorno);
-                }
+                if (retorno) return Ok(retorno);
+                else return BadRequest();
             }
         }
 

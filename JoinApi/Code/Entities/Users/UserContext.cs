@@ -14,6 +14,8 @@ public class UserContext : DbContext
     public DbSet<User> User { get; set; }
     public DbSet<UserSession> UserSession { get; set; }
 
+    #region Users
+
     public bool Register(string email, string password, string firstName, string lastName, string faceId, string googleId)
     {
         if (User.Where(s => s.Email == email).Count() > 0)
@@ -73,14 +75,19 @@ public class UserContext : DbContext
     public User Get(string sessionToken)
     {
         var session = UserSession.Where(w => w.SessionToken == sessionToken).FirstOrDefault();
-        User user = User.Where(w => w.Id == session.UserId).FirstOrDefault();
-        return user;
+        if (session != null)
+        {
+            User user = User.Where(w => w.Id == session.UserId).FirstOrDefault();
+            return user;
+        }
+        return null;
     }
 
     public User Get(int id)
     {
         User user = User.Where(w => w.Id == id).FirstOrDefault();
-        return user;
+        if (user != null) return user;
+        else return null;
     }
 
     public User Login(string email, string password)
@@ -145,6 +152,10 @@ public class UserContext : DbContext
         return false;
     }
 
+    #endregion
+
+    #region Other Functions
+
     private string GenerateSessionToken()
     {
         string date = DateTime.Now.ToString();
@@ -161,4 +172,6 @@ public class UserContext : DbContext
         }
         return Sb.ToString();
     }
+
+    #endregion
 }

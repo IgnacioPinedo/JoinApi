@@ -28,12 +28,14 @@ public class UserController : ApiController
         {
             user = UserContext.Get(userKey);
 
-            return Ok(new
-            {
-                user.Id,
-                user.FirstName,
-                user.LastName
-            });
+            if (user != null)
+                return Ok(new
+                {
+                    user.Id,
+                    user.FirstName,
+                    user.LastName
+                });
+            else BadRequest();
         }
 
         return Ok("Unauthorized");
@@ -56,12 +58,14 @@ public class UserController : ApiController
         {
             user = UserContext.Get(id);
 
-            return Ok(new
-            {
-                user.Id,
-                user.FirstName,
-                user.LastName
-            });
+            if (user != null)
+                return Ok(new
+                {
+                    user.Id,
+                    user.FirstName,
+                    user.LastName
+                });
+            else BadRequest();
         }
 
         return Ok("Unauthorized");
@@ -111,7 +115,9 @@ public class UserController : ApiController
         if (!IsValidEmail(email))
             return BadRequest("Not valid email.");
 
-        if (firstName != null && firstName != "" && password != null && password != "" && lastName != null && lastName != "")
+        if (!string.IsNullOrEmpty(firstName) && 
+            !string.IsNullOrEmpty(password) && 
+            !string.IsNullOrEmpty(lastName))
             sucess = UserContext.Register(email, password, firstName, lastName, faceId, googleId);
         else
             return BadRequest("Please fill in all fields.");

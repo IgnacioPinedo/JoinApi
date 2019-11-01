@@ -15,6 +15,8 @@ public class EventContext : DbContext
     public DbSet<EventType> EventType { get; set; }
     public DbSet<UserEvent> UserEvent { get; set; }
 
+    #region Events 
+
     public Event Get(int eventId)
     {
         return Event.Where(s => s.Id == eventId).FirstOrDefault();
@@ -22,21 +24,27 @@ public class EventContext : DbContext
 
     public Event Create(int typeId, int admId, string name, DateTime date, double longitude, double latitude)
     {
-        Event newEvent = new Event()
+        if(EventType.Where(s => s.Id == typeId).Count() > 0)
         {
-            TypeId = typeId,
-            AdministratorId = admId,
-            Name = name,
-            Date = date,
-            Latitude = latitude,
-            Longitude = longitude
-        };
 
-        Event.Add(newEvent);
-        
-        SaveChanges();
-        
-        return newEvent;
+            Event newEvent = new Event()
+            {
+                TypeId = typeId,
+                AdministratorId = admId,
+                Name = name,
+                Date = date,
+                Latitude = latitude,
+                Longitude = longitude
+            };
+
+            Event.Add(newEvent);
+
+            SaveChanges();
+
+            return newEvent;
+        }
+
+        return null;
     }
 
     public Event Update(int eventId, int typeId, int admId, string name, DateTime date, double longitude, double latitude)
@@ -48,7 +56,7 @@ public class EventContext : DbContext
             updateEvent.Latitude = (latitude != 0) ? latitude : updateEvent.Latitude;
             updateEvent.Longitude = (longitude != 0) ? longitude : updateEvent.Longitude;
             updateEvent.Name = (name != null && name != "") ? name : updateEvent.Name;
-            updateEvent.TypeId = typeId != 0 ? typeId : updateEvent.TypeId;
+            updateEvent.TypeId = typeId != 0 && EventType.Where(s => s.Id == typeId).Count() > 0 ? typeId : updateEvent.TypeId;
 
             Entry(updateEvent.Date).State = EntityState.Modified;
             Entry(updateEvent.Latitude).State = EntityState.Modified;
@@ -77,6 +85,9 @@ public class EventContext : DbContext
         return false;
     }
 
+    #endregion
+
+    #region Events
     public bool Participate(int userId, int eventId)
     {
         if(Event.Where(s => s.Id == eventId).Count() > 0 && 
@@ -98,8 +109,14 @@ public class EventContext : DbContext
         return false;
     }
 
+    #endregion
+    
+    #region Event Types
+
     public List<EventType> GetTypes()
     {
         return EventType.Select(s => s).ToList();
     }
+
+    #endregion
 }
