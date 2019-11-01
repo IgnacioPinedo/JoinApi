@@ -74,11 +74,11 @@ public class EventController : ApiController
                     
                     if (eventId == 0)
                     {
-                        getEvent = EventContext.Create(typeId, user.Id, name, date, longitude, latitude);
+                        getEvent = EventContext.Create(typeId, user.Id, name, description, date, longitude, latitude);
                     }
                     else
                     {
-                        getEvent = EventContext.Update(eventId, typeId, user.Id, name, date, longitude, latitude);
+                        getEvent = EventContext.Update(eventId, typeId, user.Id, name, description, date, longitude, latitude);
                     }
                     
                     if (getEvent != null) return Ok(getEvent);
