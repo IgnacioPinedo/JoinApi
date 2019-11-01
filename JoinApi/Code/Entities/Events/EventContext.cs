@@ -132,6 +132,15 @@ public class EventContext : DbContext
         return false;
     }
 
+    public object ToHappen(int userId)
+    {
+        List<int> participationEvents = UserEvent.Where(w => w.UserId == userId).Select(s => s.EventId).ToList();
+
+        var eventsToHappen = Event.Where(w => participationEvents.Contains(w.Id) && w.Date > DateTime.Now).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
+
+        return eventsToHappen;
+    }
+
     #endregion
 
     #region Event Types

@@ -169,6 +169,32 @@ public class EventController : ApiController
         return Ok("Unauthorized");
     }
 
+
+    [HttpPost]
+    [Route("Events/ToHappen")]
+    public IHttpActionResult ToHappen()
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            User user = new UserContext().Get(userKey);
+
+            var events = EventContext.ToHappen(user.Id);
+
+            if (events != null) return Ok(events);
+            else return BadRequest();
+        }
+
+        return Ok("Unauthorized");
+    }
+
     #endregion
 
     #region Types
