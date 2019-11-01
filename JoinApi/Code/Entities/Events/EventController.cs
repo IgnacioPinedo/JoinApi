@@ -59,7 +59,8 @@ public class EventController : ApiController
                 !double.TryParse(json["Longitude"]?.ToString(), out double longitude) ||
                 !double.TryParse(json["Latitude"]?.ToString(), out double latitude) ||
                 !DateTime.TryParse(json["Date"]?.ToString(), out DateTime date) ||
-                !string.IsNullOrEmpty(name))
+                string.IsNullOrEmpty(name) &&
+                string.IsNullOrEmpty(description))
             {
                 return BadRequest();
             }
