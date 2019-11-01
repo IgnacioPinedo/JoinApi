@@ -195,7 +195,6 @@ public class EventController : ApiController
         return Ok("Unauthorized");
     }
 
-
     [HttpGet]
     [Route("Events/HasHappen")]
     public IHttpActionResult HasHappen()
@@ -213,6 +212,31 @@ public class EventController : ApiController
             User user = new UserContext().Get(userKey);
 
             var events = EventContext.HasHappen(user.Id);
+
+            if (events != null) return Ok(events);
+            else return BadRequest();
+        }
+
+        return Ok("Unauthorized");
+    }
+
+    [HttpGet]
+    [Route("Events/Own")]
+    public IHttpActionResult Own()
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            User user = new UserContext().Get(userKey);
+
+            var events = EventContext.Own(user.Id);
 
             if (events != null) return Ok(events);
             else return BadRequest();

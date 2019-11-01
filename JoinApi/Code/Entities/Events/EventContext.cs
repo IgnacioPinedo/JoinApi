@@ -150,6 +150,13 @@ public class EventContext : DbContext
         return eventsToHappen;
     }
 
+    public object Own(int userId)
+    {
+        var eventsToHappen = Event.Where(w => w.AdministratorId == userId).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
+
+        return eventsToHappen;
+    }
+
     #endregion
 
     #region Event Types
