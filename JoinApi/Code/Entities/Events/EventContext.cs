@@ -79,6 +79,8 @@ public class EventContext : DbContext
             Event.Remove(deleteEvent);
 
             SaveChanges();
+
+            return true;
         }
         return false;
     }
@@ -175,6 +177,8 @@ public class EventContext : DbContext
         IEnumerable<UserEvent> deletedUserEvents = UserEvent.Where(s => s.EventId == eventId);
 
         UserEvent.RemoveRange(deletedUserEvents);
+
+        SaveChanges();
     }
 
     #endregion
