@@ -142,7 +142,7 @@
     <Compile Include="Code\Entities\Events\EventContext.cs" />
     <Compile Include="Code\Entities\Events\EventController.cs" />
     <Compile Include="Code\Entities\Events\Type\EventType.cs" />
-    <Compile Include="Code\Entities\Users\Event\UserEvent.cs" />
+    <Compile Include="Code\Entities\Events\UserEvent\UserEvent.cs" />
     <Compile Include="Code\Entities\Settings\SettingsController.cs" />
     <Compile Include="Code\Entities\Users\Session\UserSession.cs" />
     <Compile Include="Code\Entities\Users\User.cs" />
@@ -168,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Code\Entities\Users\Event\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

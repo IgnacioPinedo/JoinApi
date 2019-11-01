@@ -9,6 +9,8 @@ public class EventController : ApiController
 {
     private EventContext EventContext = new EventContext();
 
+    #region Events CRUD
+
     [HttpGet]
     [Route("Events({eventId})")]
     public IHttpActionResult Get(int eventId)
@@ -124,4 +126,57 @@ public class EventController : ApiController
 
         return Ok("Unauthorized");
     }
+
+    #endregion
+
+    #region Events
+
+    [HttpPost]
+    [Route("Events/Participate({eventId})")]
+    public IHttpActionResult Participate(int eventId)
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth && eventId > 0)
+        {
+
+        }
+
+        return Ok("Unauthorized");
+    }
+
+
+    #endregion
+
+    #region Types
+
+    [HttpGet]
+    [Route("Events/Types")]
+    public IHttpActionResult GetTypes()
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            List<EventType> eventTypes = EventContext.GetTypes();
+
+            return Ok(eventTypes);
+        }
+
+        return Ok("Unauthorized");
+    }
+
+    #endregion
 }

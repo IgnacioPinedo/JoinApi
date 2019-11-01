@@ -13,6 +13,7 @@ public class EventContext : DbContext
     public EventContext() : base("name=JoinDB") { }
     public DbSet<Event> Event { get; set; }
     public DbSet<EventType> EventType { get; set; }
+    public DbSet<UserEvent> UserEvent { get; set; }
 
     public Event Get(int eventId)
     {
@@ -74,5 +75,31 @@ public class EventContext : DbContext
             SaveChanges();
         }
         return false;
+    }
+
+    public bool Participate(int userId, int eventId)
+    {
+        if(Event.Where(s => s.Id == eventId).Count() > 0 && 
+           Event.Where(s => s.AdministratorId != userId && s.Id == eventId).Count() == 0 &&
+           UserEvent.Where(s => s.UserId == userId && s.EventId == eventId).Count() == 0)
+        {
+            UserEvent newUserEvent = new UserEvent
+            {
+                UserId = userId,
+                EventId = eventId
+            };
+
+            UserEvent.Add(newUserEvent);
+
+            SaveChanges();
+
+            return true;
+        }
+        return false;
+    }
+
+    public List<EventType> GetTypes()
+    {
+        return EventType.Select(s => s).ToList();
     }
 }

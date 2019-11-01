@@ -9,6 +9,8 @@ public class UserController : ApiController
 {
     private UserContext UserContext = new UserContext();
 
+    #region Users
+
     [HttpGet]
     [Route("Users")]
     public IHttpActionResult Get()
@@ -161,6 +163,9 @@ public class UserController : ApiController
         return Ok("Unauthorized");
     }
 
+    #endregion
+
+    #region Other Functions
     bool IsValidEmail(string email)
     {
         try
@@ -173,4 +178,6 @@ public class UserController : ApiController
             return false;
         }
     }
+
+    #endregion
 }
