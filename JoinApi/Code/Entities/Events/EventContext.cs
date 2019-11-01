@@ -159,6 +159,24 @@ public class EventContext : DbContext
         return eventsToHappen;
     }
 
+    public object GetFiltered(List<Location> locations, string name = "", List<int> types = null, List<DateTime> dates = null)
+    {
+        Location fromLocation = locations.First();
+        Location toLocation = locations.Last();
+        DateTime fromDate = dates.First();
+        DateTime toDate = dates.Last();
+
+        var eventsFiltered = Event.Where(w => (w.Longitude > fromLocation.Longitude && w.Longitude < toLocation.Longitude) &&
+                                              (w.Latitude > fromLocation.Latitude && w.Latitude < toLocation.Latitude) &&
+                                              (string.IsNullOrEmpty(name) || w.Name == name) &&
+                                              (types.Count == 0 || types.Contains(w.TypeId)) &&
+                                              (dates.Count == 0 || (w.Date > fromDate && w.Date < toDate)
+                                              )
+                                 ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
+
+        return eventsFiltered;
+    }
+
     #endregion
 
     #region Event Types

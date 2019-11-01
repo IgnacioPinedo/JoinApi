@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -261,6 +262,40 @@ public class EventController : ApiController
 
             if (events != null) return Ok(events);
             else return BadRequest();
+        }
+
+        return Ok("Unauthorized");
+    }
+
+    [HttpPost]
+    [Route("Events/Filter")]
+    public IHttpActionResult Filter(JObject json)
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            string name = json["Name"]?.ToString();
+            List<Location> locations = JsonConvert.DeserializeObject<List<Location>>(json["Location"]?.ToString());
+            List<int> types = JsonConvert.DeserializeObject<List<int>>(json["Types"]?.ToString());
+            List<DateTime> dates = JsonConvert.DeserializeObject<List<DateTime>>(json["Dates"]?.ToString());
+
+            if (locations == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                var eventsFiltered = EventContext.GetFiltered(locations, name, types, dates);
+
+                return Ok(eventsFiltered);
+            }
         }
 
         return Ok("Unauthorized");

@@ -141,6 +141,7 @@
     <Compile Include="Code\Entities\Events\Event.cs" />
     <Compile Include="Code\Entities\Events\EventContext.cs" />
     <Compile Include="Code\Entities\Events\EventController.cs" />
+    <Compile Include="Code\Entities\Events\Location.cs" />
     <Compile Include="Code\Entities\Events\Type\EventType.cs" />
     <Compile Include="Code\Entities\Events\UserEvent\UserEvent.cs" />
     <Compile Include="Code\Entities\Settings\SettingsController.cs" />
