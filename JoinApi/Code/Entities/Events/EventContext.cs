@@ -136,7 +136,7 @@ public class EventContext : DbContext
     {
         List<int> participationEvents = UserEvent.Where(w => w.UserId == userId).Select(s => s.EventId).ToList();
 
-        var eventsToHappen = Event.Where(w => participationEvents.Contains(w.Id) && w.Date > DateTime.Now).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
+        var eventsToHappen = Event.Where(w => (w.AdministratorId == userId || participationEvents.Contains(w.Id)) && w.Date > DateTime.Now).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
 
         return eventsToHappen;
     }
@@ -145,7 +145,7 @@ public class EventContext : DbContext
     {
         List<int> participationEvents = UserEvent.Where(w => w.UserId == userId).Select(s => s.EventId).ToList();
 
-        var eventsToHappen = Event.Where(w => participationEvents.Contains(w.Id) && w.Date < DateTime.Now).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
+        var eventsToHappen = Event.Where(w => (w.AdministratorId == userId || participationEvents.Contains(w.Id)) && w.Date < DateTime.Now).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId }).ToList();
 
         return eventsToHappen;
     }
