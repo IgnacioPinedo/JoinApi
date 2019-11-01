@@ -60,13 +60,6 @@ public class EventContext : DbContext
             updateEvent.Description = !string.IsNullOrEmpty(description) ? description : updateEvent.Description;
             updateEvent.TypeId = typeId != 0 && EventType.Where(s => s.Id == typeId).Count() > 0 ? typeId : updateEvent.TypeId;
 
-            Entry(updateEvent.Date).State = EntityState.Modified;
-            Entry(updateEvent.Latitude).State = EntityState.Modified;
-            Entry(updateEvent.Longitude).State = EntityState.Modified;
-            Entry(updateEvent.Name).State = EntityState.Modified;
-            Entry(updateEvent.Description).State = EntityState.Modified;
-            Entry(updateEvent.TypeId).State = EntityState.Modified;
-
             SaveChanges();
 
             return updateEvent;
