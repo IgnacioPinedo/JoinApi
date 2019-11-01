@@ -170,7 +170,7 @@ public class EventController : ApiController
     }
 
 
-    [HttpPost]
+    [HttpGet]
     [Route("Events/ToHappen")]
     public IHttpActionResult ToHappen()
     {
