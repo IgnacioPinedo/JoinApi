@@ -99,6 +99,29 @@ public class UserController : ApiController
             return Ok("Unauthorized");
     }
 
+    [HttpGet]
+    [Route("Users/Logout")]
+    public IHttpActionResult Logout()
+    {
+        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+        bool auth = false;
+        User user;
+
+        using (UserContext userContext = new UserContext())
+        {
+            auth = userContext.Authenticate(userKey);
+        }
+
+        if (auth)
+        {
+            user = UserContext.Get(userKey);
+
+            return Ok(UserContext.Logout(user.Id));
+        }
+
+        return Ok("Unauthorized");
+    }
+
     [HttpPost]
     [Route("Users/Register")]
     public IHttpActionResult Register(JObject json)

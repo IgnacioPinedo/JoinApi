@@ -57,6 +57,22 @@ public class UserContext : DbContext
         }
     }
 
+    public bool Logout(int userId)
+    {
+        if(UserSession.Where(s => s.UserId == userId).Count() > 0)
+        {
+            UserSession deletedUserSession = UserSession.Where(s => s.UserId == userId).FirstOrDefault();
+
+            UserSession.Remove(deletedUserSession);
+
+            SaveChanges();
+
+            return true;
+        }
+
+        return false;
+    }
+
     public bool Delete(int userId)
     {
         if (User.Where(s => s.Id == userId).Count() > 0)
