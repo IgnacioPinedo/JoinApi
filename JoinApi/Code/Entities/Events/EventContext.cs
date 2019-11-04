@@ -163,16 +163,43 @@ public class EventContext : DbContext
 
     public object GetFiltered(Location location, int radius, string name = "", List<int> types = null, List<DateTime> dates = null)
     {
-        DateTime fromDate = dates.First();
-        DateTime toDate = dates.Last();
 
-        var eventsFiltered = Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
+        if (dates != null && types != null)
+        {
+            DateTime fromDate = dates.First();
+            DateTime toDate = dates.Last();
+
+            return Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
+                                              (string.IsNullOrEmpty(name) || w.Name == name) &&
+                                              (types.Contains(w.TypeId)) &&
+                                              (w.Date > fromDate && w.Date < toDate)
+                                 ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
+        }
+        else if(dates == null && types != null)
+        {
+            return Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
                                               (string.IsNullOrEmpty(name) || w.Name == name) &&
                                               (types.Count == 0 || types.Contains(w.TypeId)) &&
-                                              (dates.Count == 0 && w.Date > SqlFunctions.GetDate() || w.Date > fromDate && w.Date < toDate)
+                                              (w.Date > SqlFunctions.GetDate())
                                  ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
+        }
+        else if(dates != null && types == null)
+        {
+            DateTime fromDate = dates.First();
+            DateTime toDate = dates.Last();
 
-        return eventsFiltered;
+            return Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
+                                              (string.IsNullOrEmpty(name) || w.Name == name) &&
+                                              (w.Date > fromDate && w.Date < toDate)
+                                 ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
+        }
+        else
+        {
+            return Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
+                                              (string.IsNullOrEmpty(name) || w.Name == name) &&
+                                              (w.Date > SqlFunctions.GetDate())
+                                 ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
+        }
     }
 
     #endregion

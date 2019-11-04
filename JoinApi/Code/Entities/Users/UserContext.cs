@@ -76,7 +76,7 @@ public class UserContext : DbContext
                 Password = hashedPassword,
                 Salt = base64Salt,
                 HomeId = homeLoc.Id,
-                WorkId = workLoc.Id
+                WorkId = workLoc != null ? workLoc.Id : 0
             };
 
             User.Add(newUser);

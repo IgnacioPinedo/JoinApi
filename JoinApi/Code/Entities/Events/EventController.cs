@@ -283,8 +283,8 @@ public class EventController : ApiController
         {
             string name = json["Name"]?.ToString();
             Location location = JsonConvert.DeserializeObject<Location>(json["Location"]?.ToString());
-            List<int> types = JsonConvert.DeserializeObject<List<int>>(json["Types"]?.ToString());
-            List<DateTime> dates = JsonConvert.DeserializeObject<List<DateTime>>(json["Dates"]?.ToString());
+            List<int> types = JsonConvert.DeserializeObject<List<int>>(json["Types"] != null ? json["Types"].ToString() : "");
+            List<DateTime> dates = JsonConvert.DeserializeObject<List<DateTime>>(json["Dates"] != null ? json["Dates"].ToString() : "");
             int radius;
 
             int.TryParse(json["Radius"]?.ToString(), out radius);

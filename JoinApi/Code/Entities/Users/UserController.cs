@@ -84,17 +84,51 @@ public class UserController : ApiController
         if (user != null)
         {
             var sessionToken = UserContext.IniciateUserSession(user.Id);
+            var locations = UserContext.Getlocations(user.Id);
 
-            return Ok(new
+
+            if(locations.Count() > 1)
             {
-                SessionToken = sessionToken,
-                User = new
+                return Ok(new
                 {
-                    user.Id,
-                    user.FirstName,
-                    user.LastName
-                }
-            });
+                    SessionToken = sessionToken,
+                    User = new
+                    {
+                        user.Id,
+                        user.FirstName,
+                        user.LastName,
+                        Home = new
+                        {
+                            locations.First().Latitude,
+                            locations.First().Longitude
+                        },
+                        work = new
+                        {
+                            locations.Last().Latitude,
+                            locations.Last().Longitude
+                        }
+                    }
+                });
+            }
+            else
+            {
+
+                return Ok(new
+                {
+                    SessionToken = sessionToken,
+                    User = new
+                    {
+                        user.Id,
+                        user.FirstName,
+                        user.LastName,
+                        Home = new
+                        {
+                            locations.First().Latitude,
+                            locations.First().Longitude
+                        }
+                    }
+                });
+            }
         }
         else
             return Ok("Unauthorized");
@@ -132,7 +166,7 @@ public class UserController : ApiController
         var lastName = json["LastName"]?.ToString();
         var password = json["Password"]?.ToString();
         Location home = JsonConvert.DeserializeObject<Location>(json["Home"]?.ToString());
-        Location work = JsonConvert.DeserializeObject<Location>(json["Work"]?.ToString());
+        Location work = JsonConvert.DeserializeObject<Location>(json["Work"] != null ? json["Work"].ToString() : "");
 
         bool sucess = false;
 
