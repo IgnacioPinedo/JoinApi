@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,8 +131,8 @@ public class UserController : ApiController
         var firstName = json["FirstName"]?.ToString();
         var lastName = json["LastName"]?.ToString();
         var password = json["Password"]?.ToString();
-        var faceId = json["FaceId"]?.ToString() != null ? json["FaceId"].ToString() : "";
-        var googleId = json["GoogleId"]?.ToString() != null ? json["GoogleId"].ToString() : "";
+        Location home = JsonConvert.DeserializeObject<Location>(json["Home"]?.ToString());
+        Location work = JsonConvert.DeserializeObject<Location>(json["Work"]?.ToString());
 
         bool sucess = false;
 
@@ -140,8 +141,9 @@ public class UserController : ApiController
 
         if (!string.IsNullOrEmpty(firstName) && 
             !string.IsNullOrEmpty(password) && 
-            !string.IsNullOrEmpty(lastName))
-            sucess = UserContext.Register(email, password, firstName, lastName, faceId, googleId);
+            !string.IsNullOrEmpty(lastName) &&
+            home != null)
+            sucess = UserContext.Register(email, password, firstName, lastName, home, work);
         else
             return BadRequest("Please fill in all fields.");
 
@@ -149,18 +151,53 @@ public class UserController : ApiController
         {
             var user = UserContext.Login(email, password);
             var sessionToken = UserContext.IniciateUserSession(user.Id);
+            var locations = UserContext.Getlocations(user.Id);
 
-            return Ok(new
+
+            if(locations.Count() > 1)
             {
-                Sucess = sucess,
-                SessionToken = sessionToken,
-                User = new
+                return Ok(new
                 {
-                    user.Id,
-                    user.FirstName,
-                    user.LastName
-                }
-            });
+                    Sucess = sucess,
+                    SessionToken = sessionToken,
+                    User = new
+                    {
+                        user.Id,
+                        user.FirstName,
+                        user.LastName,
+                        Home = new
+                        {
+                            locations.First().Latitude,
+                            locations.First().Longitude
+                        },
+                        work = new
+                        {
+                            locations.Last().Latitude,
+                            locations.Last().Longitude
+                        }
+                    }
+                });
+            }
+            else
+            {
+
+                return Ok(new
+                {
+                    Sucess = sucess,
+                    SessionToken = sessionToken,
+                    User = new
+                    {
+                        user.Id,
+                        user.FirstName,
+                        user.LastName,
+                        Home = new
+                        {
+                            locations.First().Latitude,
+                            locations.First().Longitude
+                        }
+                    }
+                });
+            }
         }
         else
             return Ok(new

@@ -13,10 +13,11 @@ public class UserContext : DbContext
 
     public DbSet<User> User { get; set; }
     public DbSet<UserSession> UserSession { get; set; }
+    public DbSet<UserLocation> UserLocation { get; set; }
 
     #region Users
 
-    public bool Register(string email, string password, string firstName, string lastName, string faceId, string googleId)
+    public bool Register(string email, string password, string firstName, string lastName, Location home, Location work = null)
     {
         if (User.Where(s => s.Email == email).Count() > 0)
         {
@@ -24,6 +25,35 @@ public class UserContext : DbContext
         }
         else
         {
+            UserLocation homeLoc = new UserLocation
+            {
+                IsHome = true,
+                IsWork = false,
+                Longitude = home.Longitude,
+                Latitude = home.Latitude
+            };
+
+            homeLoc = UserLocation.Add(homeLoc);
+
+            SaveChanges();
+
+            UserLocation workLoc = null;
+
+            if(work != null)
+            {
+                workLoc = new UserLocation
+                {
+                    IsHome = false,
+                    IsWork = true,
+                    Longitude = work.Longitude,
+                    Latitude = work.Latitude
+                };
+
+                workLoc = UserLocation.Add(workLoc);
+
+                SaveChanges();
+            }
+
             byte[] salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())
             {
@@ -45,8 +75,8 @@ public class UserContext : DbContext
                 Email = email,
                 Password = hashedPassword,
                 Salt = base64Salt,
-                FaceId = faceId,
-                GoogleId = googleId
+                HomeId = homeLoc.Id,
+                WorkId = workLoc.Id
             };
 
             User.Add(newUser);
@@ -77,7 +107,13 @@ public class UserContext : DbContext
     {
         if (User.Where(s => s.Id == userId).Count() > 0)
         {
-            User deletedUser = User.Where(s => s.Id == userId).FirstOrDefault();
+            UserSession deletedSession = UserSession.Where(w => w.UserId == userId).FirstOrDefault();
+
+            UserSession.Remove(deletedSession);
+
+            SaveChanges();
+
+            User deletedUser = User.Where(w => w.Id == userId).FirstOrDefault();
 
             User.Remove(deletedUser);
 
@@ -104,6 +140,24 @@ public class UserContext : DbContext
         User user = User.Where(w => w.Id == id).FirstOrDefault();
         if (user != null) return user;
         else return null;
+    }
+
+    public List<UserLocation> Getlocations(int id)
+    {
+        User user = User.Where(w => w.Id == id).FirstOrDefault();
+
+        UserLocation home = UserLocation.Where(w => w.Id == user.HomeId).FirstOrDefault();
+
+        UserLocation work = UserLocation.Where(w => w.Id == user.WorkId).FirstOrDefault();
+
+        var locations = new List<UserLocation>();
+
+        locations.Add(home);
+
+        if(work != null)
+            locations.Add(work);
+
+        return locations;
     }
 
     public User Login(string email, string password)

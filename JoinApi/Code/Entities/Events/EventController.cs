@@ -282,17 +282,23 @@ public class EventController : ApiController
         if (auth)
         {
             string name = json["Name"]?.ToString();
-            List<Location> locations = JsonConvert.DeserializeObject<List<Location>>(json["Location"]?.ToString());
+            Location location = JsonConvert.DeserializeObject<Location>(json["Location"]?.ToString());
             List<int> types = JsonConvert.DeserializeObject<List<int>>(json["Types"]?.ToString());
             List<DateTime> dates = JsonConvert.DeserializeObject<List<DateTime>>(json["Dates"]?.ToString());
+            int radius;
 
-            if (locations == null)
+            int.TryParse(json["Radius"]?.ToString(), out radius);
+
+            radius = radius == 0 ? 2000 : radius;
+
+
+            if (location == null)
             {
                 return BadRequest();
             }
             else
             {
-                var eventsFiltered = EventContext.GetFiltered(locations, name, types, dates);
+                var eventsFiltered = EventContext.GetFiltered(location, radius, name, types, dates);
 
                 return Ok(eventsFiltered);
             }

@@ -15,6 +15,6 @@ public class User
     public string Email { get; set; }
     public string Password { get; set; }
     public string Salt { get; set; }
-    public string FaceId { get; set; }
-    public string GoogleId { get; set; }
+    public int HomeId { get; set; }
+    public int WorkId { get; set; }
 }

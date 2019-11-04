@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Spatial;
+using System.Data.Entity.SqlServer;
+using System.Device.Location;
 using System.Linq;
 using System.Spatial;
 using System.Web;
@@ -159,19 +161,15 @@ public class EventContext : DbContext
         return eventsToHappen;
     }
 
-    public object GetFiltered(List<Location> locations, string name = "", List<int> types = null, List<DateTime> dates = null)
+    public object GetFiltered(Location location, int radius, string name = "", List<int> types = null, List<DateTime> dates = null)
     {
-        Location fromLocation = locations.First();
-        Location toLocation = locations.Last();
         DateTime fromDate = dates.First();
         DateTime toDate = dates.Last();
 
-        var eventsFiltered = Event.Where(w => (w.Longitude > fromLocation.Longitude && w.Longitude < toLocation.Longitude) &&
-                                              (w.Latitude > fromLocation.Latitude && w.Latitude < toLocation.Latitude) &&
+        var eventsFiltered = Event.Where(w => (SqlFunctions.SquareRoot(Math.Pow(w.Longitude - location.Longitude, 2) + Math.Pow(w.Latitude - location.Latitude, 2)) <= radius / 111139) &&
                                               (string.IsNullOrEmpty(name) || w.Name == name) &&
                                               (types.Count == 0 || types.Contains(w.TypeId)) &&
-                                              (dates.Count == 0 || (w.Date > fromDate && w.Date < toDate)
-                                              )
+                                              (dates.Count == 0 && w.Date > SqlFunctions.GetDate() || w.Date > fromDate && w.Date < toDate)
                                  ).Select(s => new { s.Id, s.Name, s.Description, s.Date, s.TypeId, s.Longitude, s.Latitude }).ToList();
 
         return eventsFiltered;
