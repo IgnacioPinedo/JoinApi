@@ -204,7 +204,7 @@ public class UserController : ApiController
                             locations.First().Latitude,
                             locations.First().Longitude
                         },
-                        work = new
+                        Work = new
                         {
                             locations.Last().Latitude,
                             locations.Last().Longitude
