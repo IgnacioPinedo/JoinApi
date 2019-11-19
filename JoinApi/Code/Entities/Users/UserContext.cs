@@ -311,8 +311,6 @@ public class UserContext : DbContext
 
         CloudBlockBlob blob = container.GetBlockBlobReference(userImgUrl);
         blob.UploadFromFileAsync(path).Wait();
-
-        File.Delete(path);
     }
 
     public bool UploadUserPhoto(HttpPostedFile file, string userImgUrl)
