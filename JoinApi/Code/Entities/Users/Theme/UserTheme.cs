@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-[Table("tb_EventType")]
-public class EventType
+[Table("tb_UserTheme")]
+public class UserTheme
 {
     [Key]
     public int Id { get; private set; }
-    public string Type { get; set; }
+    public string ThemeName { get; set; }
 }

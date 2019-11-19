@@ -49,6 +49,7 @@ public class EventController : ApiController
         if(auth)
         {
             string name = json["Name"]?.ToString();
+            string address = json["Address"]?.ToString();
             string description = json["Description"]?.ToString();
 
             if (!int.TryParse(json["EventId"]?.ToString(), out int eventId))
@@ -61,6 +62,7 @@ public class EventController : ApiController
                 !double.TryParse(json["Latitude"]?.ToString(), out double latitude) ||
                 !DateTime.TryParse(json["Date"]?.ToString(), out DateTime date) ||
                 string.IsNullOrEmpty(name) &&
+                string.IsNullOrEmpty(address) &&
                 string.IsNullOrEmpty(description))
             {
                 return BadRequest();
@@ -76,11 +78,11 @@ public class EventController : ApiController
                     
                     if (eventId == 0)
                     {
-                        getEvent = EventContext.Create(typeId, user.Id, name, description, date, longitude, latitude);
+                        getEvent = EventContext.Create(typeId, user.Id, name, description, address, date, longitude, latitude);
                     }
                     else
                     {
-                        getEvent = EventContext.Update(eventId, typeId, user.Id, name, description, date, longitude, latitude);
+                        getEvent = EventContext.Update(eventId, typeId, user.Id, name, description, address, date, longitude, latitude);
                     }
                     
                     if (getEvent != null) return Ok(getEvent);

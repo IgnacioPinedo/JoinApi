@@ -11,7 +11,6 @@ using System.Web;
 
 public class EventContext : DbContext
 {
-    private readonly int DefaultSRID = 4326;
     public EventContext() : base("name=JoinDB") { }
     public DbSet<Event> Event { get; set; }
     public DbSet<EventType> EventType { get; set; }
@@ -24,7 +23,7 @@ public class EventContext : DbContext
         return Event.Where(s => s.Id == eventId).FirstOrDefault();
     }
 
-    public Event Create(int typeId, int admId, string name, string description, DateTime date, double longitude, double latitude)
+    public Event Create(int typeId, int admId, string name, string description, string address, DateTime date, double longitude, double latitude)
     {
         if(EventType.Where(s => s.Id == typeId).Count() > 0)
         {
@@ -35,6 +34,7 @@ public class EventContext : DbContext
                 AdministratorId = admId,
                 Name = name,
                 Description = description,
+                Address = address,
                 Date = date,
                 Latitude = latitude,
                 Longitude = longitude
@@ -50,7 +50,7 @@ public class EventContext : DbContext
         return null;
     }
 
-    public Event Update(int eventId, int typeId, int admId, string name, string description, DateTime date, double longitude, double latitude)
+    public Event Update(int eventId, int typeId, int admId, string name, string description, string address, DateTime date, double longitude, double latitude)
     {
         Event updateEvent = Event.Where(s => s.Id == eventId && s.AdministratorId == admId).FirstOrDefault();
         if (updateEvent != null)
@@ -60,6 +60,7 @@ public class EventContext : DbContext
             updateEvent.Longitude = (longitude != 0) ? longitude : updateEvent.Longitude;
             updateEvent.Name = !string.IsNullOrEmpty(name) ? name : updateEvent.Name;
             updateEvent.Description = !string.IsNullOrEmpty(description) ? description : updateEvent.Description;
+            updateEvent.Address = !string.IsNullOrEmpty(address) ? address : updateEvent.Address;
             updateEvent.TypeId = typeId != 0 && EventType.Where(s => s.Id == typeId).Count() > 0 ? typeId : updateEvent.TypeId;
 
             SaveChanges();

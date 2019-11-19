@@ -15,6 +15,9 @@ public class User
     public string Email { get; set; }
     public string Password { get; set; }
     public string Salt { get; set; }
+    public string ImageURL { get; set; }
+    public string Status { get; set; }
     public int HomeId { get; set; }
     public int WorkId { get; set; }
+    public int ThemeId { get; set; }
 }

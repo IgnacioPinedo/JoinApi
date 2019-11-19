@@ -6,6 +6,12 @@ using System.Data.Entity;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Text;
+using System.IO;
+using System.Drawing;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.Drawing.Imaging;
+using System.Configuration;
 
 public class UserContext : DbContext
 {
@@ -14,10 +20,13 @@ public class UserContext : DbContext
     public DbSet<User> User { get; set; }
     public DbSet<UserSession> UserSession { get; set; }
     public DbSet<UserLocation> UserLocation { get; set; }
+    public DbSet<UserTheme> UserTheme { get; set; }
+
+    private string JoinStorageCS = ConfigurationManager.ConnectionStrings["JoinStorage"].ConnectionString;
 
     #region Users
 
-    public bool Register(string email, string password, string firstName, string lastName, Location home, Location work = null)
+    public bool Register(string email, string password, string firstName, string lastName, string status, int themeId, Location home, Location work = null)
     {
         if (User.Where(s => s.Email == email).Count() > 0)
         {
@@ -68,6 +77,15 @@ public class UserContext : DbContext
                 iterationCount: 10000,
                 numBytesRequested: 256 / 8));
 
+            salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+            string image = Convert.ToBase64String(salt);
+
+            SetDefaultUserPhoto(image + ".png");
+
             var newUser = new User
             {
                 FirstName = firstName,
@@ -75,8 +93,11 @@ public class UserContext : DbContext
                 Email = email,
                 Password = hashedPassword,
                 Salt = base64Salt,
+                ImageURL = image + ".png",
+                Status = !string.IsNullOrEmpty(status) ? status : "Online",
                 HomeId = homeLoc.Id,
-                WorkId = workLoc != null ? workLoc.Id : 0
+                WorkId = workLoc != null ? workLoc.Id : 0,
+                ThemeId = (themeId != 0 && UserTheme.Where(w => w.Id == themeId).Count() > 0) ? themeId : 1
             };
 
             User.Add(newUser);
@@ -85,6 +106,68 @@ public class UserContext : DbContext
 
             return true;
         }
+    }
+
+    public bool Update(int userId, string firstName = "", string lastName = "", string status = "", int themeId = 0, Location home = null, Location work = null)
+    {
+
+        if (User.Where(s => s.Id == userId).Count() > 0)
+        {
+            User userUpdated = User.Where(w => w.Id == userId).First();
+
+            userUpdated.FirstName = !string.IsNullOrEmpty(firstName) ? firstName : userUpdated.FirstName;
+            userUpdated.LastName = !string.IsNullOrEmpty(lastName) ? lastName : userUpdated.LastName;
+            userUpdated.Status = !string.IsNullOrEmpty(status) ? status : userUpdated.Status;
+            userUpdated.ThemeId = (themeId != 0 && UserTheme.Where(w => w.Id == themeId).Count() > 0) ? themeId : userUpdated.ThemeId;
+
+            SaveChanges();
+
+            if (home != null)
+            {
+                UserLocation homeUpdated = UserLocation.Where(w => w.Id == userUpdated.HomeId).First();
+
+                homeUpdated.Latitude = home.Latitude;
+                homeUpdated.Longitude = home.Longitude;
+
+                SaveChanges();
+
+            }
+            if(work != null)
+            {
+                if(userUpdated.WorkId != 0)
+                {
+                    UserLocation workUpdated = UserLocation.Where(w => w.Id == userUpdated.WorkId).First();
+
+                    workUpdated.Latitude = home.Latitude;
+                    workUpdated.Longitude = home.Longitude;
+
+                    SaveChanges();
+                }
+                else
+                {
+                    UserLocation workLoc = new UserLocation
+                    {
+                        IsHome = true,
+                        IsWork = false,
+                        Longitude = home.Longitude,
+                        Latitude = home.Latitude
+                    };
+
+                    workLoc = UserLocation.Add(workLoc);
+
+                    SaveChanges();
+
+                    userUpdated.WorkId = workLoc.Id;
+
+                    SaveChanges();
+                }
+            }
+
+            return true;
+        }
+
+
+        return true;
     }
 
     public bool Logout(int userId)
@@ -215,11 +298,73 @@ public class UserContext : DbContext
         return sessionToken;
     }
 
+    private void SetDefaultUserPhoto(string userImgUrl)
+    {
+        var path = AppDomain.CurrentDomain.BaseDirectory + @"tmp\JoinUser.png";
+
+        CloudStorageAccount account = CloudStorageAccount.Parse(JoinStorageCS);
+        CloudBlobClient serviceClient = account.CreateCloudBlobClient();
+
+        // Create container. Name must be lower case.
+        var container = serviceClient.GetContainerReference("images");
+        container.CreateIfNotExistsAsync().Wait();
+
+        CloudBlockBlob blob = container.GetBlockBlobReference(userImgUrl);
+        blob.UploadFromFileAsync(path).Wait();
+
+        File.Delete(path);
+    }
+
+    public bool UploadUserPhoto(HttpPostedFile file, string userImgUrl)
+    {
+        try
+        {
+            Stream strm = file.InputStream;
+
+            Bitmap bitmap;
+
+            using (Image img = Image.FromStream(strm))
+            {
+                int width = img.Width < 150 ? img.Width : 150;
+                int height = img.Height < 150 ? img.Height : 150;
+
+                bitmap = new Bitmap(img, width, height);
+            }
+            var path = AppDomain.CurrentDomain.BaseDirectory + @"tmp\" + userImgUrl;
+
+            bitmap.Save(path);
+
+            CloudStorageAccount account = CloudStorageAccount.Parse(JoinStorageCS);
+            CloudBlobClient serviceClient = account.CreateCloudBlobClient();
+
+            // Create container. Name must be lower case.
+            var container = serviceClient.GetContainerReference("images");
+            container.CreateIfNotExistsAsync().Wait();
+
+            CloudBlockBlob blob = container.GetBlockBlobReference(userImgUrl);
+            blob.UploadFromFileAsync(path).Wait();
+
+            File.Delete(path);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        
+    }
+
     public bool Authenticate(string userKey)
     {
         if (UserSession.Where(w => w.SessionToken == userKey).Count() > 0)
             return true;
         return false;
+    }
+
+    public List<UserTheme> GetThemes()
+    {
+        return UserTheme.Select(s => s).ToList();
     }
 
     #endregion
