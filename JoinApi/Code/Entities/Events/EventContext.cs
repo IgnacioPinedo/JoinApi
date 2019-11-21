@@ -40,7 +40,17 @@ public class EventContext : DbContext
                 Longitude = longitude
             };
 
-            Event.Add(newEvent);
+            newEvent = Event.Add(newEvent);
+
+            SaveChanges();
+
+            UserEvent newUserEvent = new UserEvent
+            {
+                UserId = admId,
+                EventId = newEvent.Id
+            };
+
+            UserEvent.Add(newUserEvent);
 
             SaveChanges();
 
