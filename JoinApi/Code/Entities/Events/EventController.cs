@@ -115,7 +115,7 @@ public class EventController : ApiController
                 bool retorno = false;
                 user = userContext.Get(userKey);
                 
-                EventContext.Delete(eventId, user.Id);
+                retorno = EventContext.Delete(eventId, user.Id);
 
                 if (retorno) return Ok(retorno);
                 else return BadRequest();
@@ -155,7 +155,7 @@ public class EventController : ApiController
     [Route("Events/Participants({eventId})")]
     public IHttpActionResult Participants(int eventId)
     {
-        string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
+            string userKey = this.Request.Headers.GetValues("uk").FirstOrDefault();
         bool auth = false;
 
         using (UserContext userContext = new UserContext())

@@ -123,9 +123,27 @@ public class EventContext : DbContext
         return false;
     }
 
-    public List<int> Participants(int eventId)
+    public List<object> Participants(int eventId)
     {
-        List<int> participants = UserEvent.Where(w => w.EventId == eventId).Select(s => s.UserId).ToList();
+        List<int> participantsIds = UserEvent.Where(w => w.EventId == eventId).Select(s => s.UserId).ToList();
+
+        List<object> participants = new List<object>();
+
+        using (UserContext userContext = new UserContext())
+        {
+            foreach (var id in participantsIds)
+            {
+                var user = userContext.Get(id);
+
+                participants.Add(new
+                {
+                    Name = user.FirstName + user.LastName,
+                    Id = id
+                });
+            }
+
+            participantsIds.ForEach(s => userContext.Get(s));
+        }
 
         return participants;
     }
